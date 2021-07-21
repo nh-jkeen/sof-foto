@@ -2,13 +2,11 @@
 <html lang="en">
 
 <head>
-	<link rel='stylesheet' type='text/css' href='./src/css/loader.css'>
-
-    <script src="https://cdn.jsdelivr.net/npm/fhirclient/build/fhir-client.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/fhirclient/build/fhir-client.js"></script>
 	<script>
 		FHIR.oauth2.authorize({
 			'client_id': '2324c9fc-e12e-4c55-afa8-4fe046c50949',
-			'scope': 'patient/*.read patient/*.search launch online_access openid fhirUser'
+			'scope': 'launch patient/*.read openid fhirUser online_access'
 		});
 	</script>
 </head>

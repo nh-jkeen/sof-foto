@@ -5,7 +5,6 @@ const GetSmartClient = function() {
                 reject(err);
             }
 
-            console.log(smart);
             resolve(smart);
         })
     })

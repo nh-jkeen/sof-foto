@@ -5,7 +5,8 @@
 
 <script>
 
-import SmartClient from './smartClient'
+import 'fhirclient/build/fhir-client'
+import smartClient  from './smartClient'
 import HelloWorld from './components/HelloWorld.vue'
 
 export default {
@@ -14,8 +15,14 @@ export default {
     HelloWorld
   },
   async mounted(){
-    const smart = await SmartClient();
+    const smart = await smartClient ();
     console.log(smart);
+
+    const pat = await smart.patient.read();
+    console.log(pat);
+
+    const prc = await smart.user.read();
+    console.log(prc);
   }
 }
 </script>
