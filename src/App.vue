@@ -4,12 +4,18 @@
 </template>
 
 <script>
+
+import SmartClient from './smartClient'
 import HelloWorld from './components/HelloWorld.vue'
 
 export default {
   name: 'App',
   components: {
     HelloWorld
+  },
+  async mounted(){
+    const smart = await SmartClient();
+    console.log(smart);
   }
 }
 </script>
