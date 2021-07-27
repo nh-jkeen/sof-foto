@@ -9,6 +9,7 @@
     "deploy": "sh scripts/deploy.sh"
   },
   "dependencies": {
+    "@types/fhir": "0.0.34",
     "bootstrap": "^5.0.2",
     "core-js": "^3.6.5",
     "fhirclient": "^2.4.0",
