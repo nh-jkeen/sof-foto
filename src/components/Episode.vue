@@ -1,17 +1,26 @@
 <template>
   <div id="episodeTableView">
-    <table class="table table-hover table-dark">
+    <table class="table table-hover table-dark table-sm">
       <thead>
         <tr>
           <th scope="col">EncounterID</th>
-          <th scope="col">First</th>
-          <th scope="col">Last</th>
-          <th scope="col">Handle</th>
+          <th scope="col">Body Part</th>
+          <th scope="col">Create Date</th>
+          <th scope="col">Impairment</th>
+          <th scope="col">Therapist</th>
+          <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="episode in episodes" :key="episode.EpisodeId">
           <td>{{ episode.EpisodeId }}</td>
+          <td>{{ episode.BodyPartText }}</td>
+          <td>{{ episode.CreateDate }}</td>
+          <td>{{ episode.ImpairmentText }}</td>
+          <td>{{ episode.TherapistName }}</td>
+          <td>
+            <font-awesome-icon :icon="['fas', 'user-secret']" />
+          </td>
         </tr>
       </tbody>
     </table>

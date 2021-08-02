@@ -12,12 +12,12 @@
 
 import { defineComponent } from "@vue/runtime-core";
 import { HttpClient } from "../models/HttpClient";
-import { Patient } from "../models/FOTO/Patient";
+// import { Patient } from "../models/FOTO/Patient";
 import { Episode } from "../models/FOTO/Episode";
-import FHIRClient from "fhirclient";
+// import FHIRClient from "fhirclient";
 import EpisodeList from "../components/Episode.vue";
 import Client from 'fhirclient/lib/Client';
-import * as R4 from 'fhir/r4';
+// import * as R4 from 'fhir/r4';
 
 export default defineComponent({
 	name: "App",
@@ -48,32 +48,52 @@ export default defineComponent({
                 throw new Error("The outbound url is missing.");
     
             this.OutboundClient = new HttpClient(api_base!, api_key);
-            this.SmartClient = await FHIRClient.oauth2.ready();
+            // this.SmartClient = await FHIRClient.oauth2.ready();
             
-            const patient = await this.SmartClient.patient.read();
-            if(!patient) 
-                throw new Error("Patient not found in EMR.");
+            // const patient = await this.SmartClient.patient.read();
+            // if(!patient) 
+            //     throw new Error("Patient not found in EMR.");
             
-            if(patient.birthDate === "")
-                throw new Error("Unable to find patient birthdate. Please provide a birthdate for this patient.");
+            // if(patient.birthDate === "")
+            //     throw new Error("Unable to find patient birthdate. Please provide a birthdate for this patient.");
 
-            const locationId = this.SmartClient.getState("tokenResponse.location");
-            if(locationId === "" || locationId === undefined)
-                throw new Error("Unbled to find location identifier on token response");
+            // const locationId = this.SmartClient.getState("tokenResponse.location");
+            // if(locationId === "" || locationId === undefined)
+            //     throw new Error("Unbled to find location identifier on token response");
     
-            const location = await this.SmartClient.request(`Location/${locationId}`);
-            if(!location || location.alias.length == 0) 
-                throw new Error("Location not found in EMR.");
+            // const location = await this.SmartClient.request(`Location/${locationId}`);
+            // if(!location || location.alias.length == 0) 
+            //     throw new Error("Location not found in EMR.");
     
-            const transformedPat = Patient.FromResource(patient as R4.Patient);
-            transformedPat.ExternalSiteID = location.alias[0];
+            // const transformedPat = Patient.FromResource(patient as R4.Patient);
+            // transformedPat.ExternalSiteID = location.alias[0];
     
-            const patCreateResponse = await this.OutboundClient.Post(transformedPat.ToJSON(), "patient2/json");
+            // const patCreateResponse = await this.OutboundClient.Post(transformedPat.ToJSON(), "patient2/json");
 
-            if(!patCreateResponse.Success)
-                throw new Error(`Error creating or updating patient: ${patCreateResponse.Text}`);
+            // if(!patCreateResponse.Success)
+            //     throw new Error(`Error creating or updating patient: ${patCreateResponse.Text}`);
     
-            this.Episodes = await this.OutboundClient.Get(`episode/json/${patCreateResponse.PatientExternalID}`);
+            // this.Episodes = await this.OutboundClient.Get(`episode/json/${1}`);
+            this.Episodes = [
+                {
+                    "BodyPartId": 18,
+                    "BodyPartText": "Lumbar Spine",
+                    "CreateDate": new Date(parseInt("/Date(1627055636747-0400)/".replace('/Date(', ''))).toLocaleString(),
+                    "EpisodeId": 21152,
+                    "ImpairmentId": 50,
+                    "ImpairmentText": "NOC-musculo-skeletal disorder",
+                    "TherapistName": "Han Solo"
+                },
+                {
+                    "BodyPartId": 18,
+                    "BodyPartText": "Lumbar Spine",
+                    "CreateDate": "/Date(1627055636747-0400)/",
+                    "EpisodeId": 21152,
+                    "ImpairmentId": 50,
+                    "ImpairmentText": "NOC-musculo-skeletal disorder",
+                    "TherapistName": "Han Solo"
+                },
+            ] as Array<Episode>;
         }
         catch(ex){
             this.ErrMessage = (ex as Error).message;
