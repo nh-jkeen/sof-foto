@@ -1,6 +1,6 @@
 import * as R4 from 'fhir/r4';
 
-export class FotoPatient  {
+export class Patient  {
 
     private internalID: number | null = null;
     private firstName: string = "";
@@ -108,6 +108,13 @@ export class FotoPatient  {
         return this.dateOfBirth?.toDateString() ?? "";
     }
 
+    get DateOfBirthStr(){
+        if(this.dateOfBirth)
+            return `/Date(${this.dateOfBirth.getTime()}-0400)/`
+
+        return null;
+    }
+
     set Name(name: R4.HumanName | string){
         if(typeof name !== "string"){
             if (name.family){
@@ -176,7 +183,7 @@ export class FotoPatient  {
             FirstName: this.FirstName,
             LastName: this.LastName,
             Alias: "",
-            DateOfBirth: this.DateOfBirth,
+            DateOfBirth: this.DateOfBirthStr,
             Email: this.Email,
             ExternalID: this.ExternalID,
             ExternalSiteID: this.ExternalSiteID,
@@ -187,7 +194,7 @@ export class FotoPatient  {
     }
 
     static FromResource(pat: R4.Patient) {
-        const patient = new FotoPatient();
+        const patient = new Patient();
         
         if(pat.id)
             patient.ExternalID = pat.id;

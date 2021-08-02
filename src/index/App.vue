@@ -1,102 +1,85 @@
+
 <template>
 	<img alt="Net Health Logo" class="nh_brand_image" src="../assets/nh_brand.png" />
-	<HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+
+    <h2 v-if="ErrMessage !== ''">{{ ErrMessage }}</h2>
+    <div v-else>
+        <episode-list :episodes="Episodes"></episode-list>
+    </div>
 </template>
 
 <script lang="ts">
 
 import { defineComponent } from "@vue/runtime-core";
 import { HttpClient } from "../models/HttpClient";
-import { FotoPatient } from "../models/FotoPatient";
+import { Patient } from "../models/FOTO/Patient";
+import { Episode } from "../models/FOTO/Episode";
 import FHIRClient from "fhirclient";
-import HelloWorld from "../components/HelloWorld.vue";
+import EpisodeList from "../components/Episode.vue";
 import Client from 'fhirclient/lib/Client';
 import * as R4 from 'fhir/r4';
 
 export default defineComponent({
 	name: "App",
 	components: {
-		HelloWorld,
+		EpisodeList,
 	},
     data: function() {
         return {
-            ErrMessage: "",
-            InternalPatientID: null,
             OutboundClient: {} as HttpClient,
-            FHIRPatient: {} as R4.Patient,
-            FHIREncounter: {} as R4.Encounter,
-            FHIRPractitioner: {} as R4.Practitioner,
-            FHIRLocation: {} as R4.Location,
-            SmartClient: {} as Client
+            SmartClient: {} as Client,
+            Episodes: new Array<Episode>(),
+            ErrMessage: "",
+            ExternalSiteID: "",
+            ExternalPatientID: "",
+            ExternalPatientAlias: "",
+            EncounterID: ""
         }
 	},
-    methods: {
-        setError: function(message: string){
-            this.ErrMessage = message;
-            throw Error(message);
+    async created(){
+        try{
+            const api_key = process.env.VUE_APP_OUTBOUND_APIKEY;
+            const api_base = process.env.VUE_APP_OUTBOUND_BASE;
+    
+            if(!api_key)
+                throw new Error("The outbound api key is missing.");
+    
+            if(!api_base)
+                throw new Error("The outbound url is missing.");
+    
+            this.OutboundClient = new HttpClient(api_base!, api_key);
+            this.SmartClient = await FHIRClient.oauth2.ready();
+            
+            const patient = await this.SmartClient.patient.read();
+            if(!patient) 
+                throw new Error("Patient not found in EMR.");
+            
+            if(patient.birthDate === "")
+                throw new Error("Unable to find patient birthdate. Please provide a birthdate for this patient.");
+
+            const locationId = this.SmartClient.getState("tokenResponse.location");
+            if(locationId === "" || locationId === undefined)
+                throw new Error("Unbled to find location identifier on token response");
+    
+            const location = await this.SmartClient.request(`Location/${locationId}`);
+            if(!location || location.alias.length == 0) 
+                throw new Error("Location not found in EMR.");
+    
+            const transformedPat = Patient.FromResource(patient as R4.Patient);
+            transformedPat.ExternalSiteID = location.alias[0];
+    
+            const patCreateResponse = await this.OutboundClient.Post(transformedPat.ToJSON(), "patient2/json");
+
+            if(!patCreateResponse.Success)
+                throw new Error(`Error creating or updating patient: ${patCreateResponse.Text}`);
+    
+            this.Episodes = await this.OutboundClient.Get(`episode/json/${patCreateResponse.PatientExternalID}`);
+        }
+        catch(ex){
+            this.ErrMessage = (ex as Error).message;
         }
     },
-    created(){
-        const api_key = process.env.VUE_APP_OUTBOUND_APIKEY;
-        const api_base = process.env.VUE_APP_OUTBOUND_BASE;
-
-        if(!api_key)
-            this.setError("The outbound api key is missing.");
-
-        if(!api_base)
-            this.setError("The outbound url is missing.");
-
-        this.OutboundClient = new HttpClient(api_base!, api_key);
-    },
     async mounted(){
-        await FHIRClient.oauth2.ready()
-        .then(
-            client => {
-                const locationId = client.getState("tokenResponse.location");
-
-                if(locationId === "" || locationId === undefined)
-                    this.setError("Unbled to find location identifier on token response");
-
-                this.SmartClient = client as Client;
-
-                return Promise.all([
-                    client.patient.read(),
-                    client.user.read(),
-                    client.encounter.read(),
-                    client.request(`Location/${locationId}`)
-                ])
-            }
-        )
-        .then(
-            async ([patient, practitioner, encounter, location]) => {
-                if(!patient) this.setError("Patient not found in EMR.");
-                if(!practitioner) this.setError("Practitioner not found in EMR.");
-                if(!encounter) this.setError("Encounter not found in EMR.");
-                if(!location) this.setError("Location not found in EMR.");
-                if(location.alias.length == 0) this.setError("Location alias not found in location response.");
-
-                this.FHIRPatient = patient as R4.Patient;
-                this.FHIRPractitioner = practitioner as R4.Practitioner;
-                this.FHIREncounter = encounter as R4.Encounter;
-                this.FHIRLocation = location as R4.Location;
-
-                const transformedPat = FotoPatient.FromResource(this.FHIRPatient);
-                transformedPat.ExternalSiteID = location.alias[0];
-
-                await this.OutboundClient.Post(transformedPat.ToJSON(), "patient2/json")
-                .then( 
-                    internalPat => {
-                        console.log(internalPat);
-                        this.InternalPatientID = internalPat.MessageID;
-                    }
-                )
-            },
-            err => {
-                this.setError(err.error || err);
-            }
-        )
-
-        console.log(this.InternalPatientID);
     }
 });
 </script>

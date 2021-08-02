@@ -13,8 +13,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
-      "webpack-env",
-      "node"
+      "webpack-env"
     ],
     "paths": {
       "@/*": [
@@ -25,8 +24,7 @@
       "esnext",
       "dom",
       "dom.iterable",
-      "scripthost",
-      "es6",
+      "scripthost"
     ]
   },
   "include": [
