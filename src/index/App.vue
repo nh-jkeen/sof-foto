@@ -1,10 +1,9 @@
 
 <template>
-	<img alt="Net Health Logo" class="nh_brand_image" src="../assets/nh_brand.png" />
-
+    <Toast />
     <h2 v-if="ErrMessage !== ''">{{ ErrMessage }}</h2>
     <div v-else>
-        <episode-list :episodes="Episodes"></episode-list>
+        <episode-list :episodeArr="Episodes"></episode-list>
     </div>
 </template>
 
@@ -38,16 +37,16 @@ export default defineComponent({
 	},
     async created(){
         try{
-            const api_key = process.env.VUE_APP_OUTBOUND_APIKEY;
-            const api_base = process.env.VUE_APP_OUTBOUND_BASE;
+            // const api_key = process.env.VUE_APP_OUTBOUND_APIKEY;
+            // const api_base = process.env.VUE_APP_OUTBOUND_BASE;
     
-            if(!api_key)
-                throw new Error("The outbound api key is missing.");
+            // if(!api_key)
+            //     throw new Error("The outbound api key is missing.");
     
-            if(!api_base)
-                throw new Error("The outbound url is missing.");
+            // if(!api_base)
+            //     throw new Error("The outbound url is missing.");
     
-            this.OutboundClient = new HttpClient(api_base!, api_key);
+            // this.OutboundClient = new HttpClient(api_base!, api_key);
             // this.SmartClient = await FHIRClient.oauth2.ready();
             
             // const patient = await this.SmartClient.patient.read();
@@ -77,9 +76,9 @@ export default defineComponent({
             this.Episodes = [
                 {
                     "BodyPartId": 18,
-                    "BodyPartText": "Lumbar Spine",
+                    "BodyPartText": "Lumbar Spine1",
                     "CreateDate": new Date(parseInt("/Date(1627055636747-0400)/".replace('/Date(', ''))).toLocaleString(),
-                    "EpisodeId": 21152,
+                    "EpisodeId": 21153,
                     "ImpairmentId": 50,
                     "ImpairmentText": "NOC-musculo-skeletal disorder",
                     "TherapistName": "Han Solo"
@@ -100,22 +99,20 @@ export default defineComponent({
         }
     },
     async mounted(){
+        this.$toast.add({severity:'success', summary: 'Success Message', detail:'Order submitted', life: 3000});
     }
 });
 </script>
 
 <style lang="scss">
 .nh_brand_image{
-    width: 25rem;
-}
-html{
-    background-color: $nhCharcoal;
+    width: 10rem;
 }
 #app {
 	font-family: Avenir, Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	text-align: center;
-	margin-top: 60px;
+	// text-align: center;
+	margin-top: 1rem;
 }
 </style>

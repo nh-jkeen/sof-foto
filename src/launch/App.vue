@@ -1,5 +1,9 @@
+<template>
+    <div></div>
+</template>
+
 <script lang="ts">
-const FHIR = require("fhirclient");
+import FHIR from "fhirclient";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -7,8 +11,9 @@ export default defineComponent({
 	components: {},
 	async mounted() {
 		FHIR.oauth2.authorize({
-			client_id: "2324c9fc-e12e-4c55-afa8-4fe046c50949",
-			scope: "launch patient/*.read online_access openid fhirUser",
+			client_id: "e20b94f7-9bcc-49ae-a534-4856166edd80",
+			scope: "launch online_access openid fhirUser",
+            completeInTarget: true
 		});
 	},
 });
