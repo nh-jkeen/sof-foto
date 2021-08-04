@@ -14,6 +14,21 @@ export class Patient  {
     private externalSiteID: string = "";
     private alias: string = "";
 
+    set Alias(al: R4.Identifier | string){
+        if(typeof al !== "string"){
+            if(al.value){
+                this.alias = al.value;
+            }
+        }
+        else if(al){
+            this.alias = al;
+        }
+    }
+
+    get Alias(){
+        return this.alias;
+    }
+
     set InternalID(id : number | null){
         this.internalID = id;
     }
@@ -194,7 +209,7 @@ export class Patient  {
     }
 
     static FromResource(pat: R4.Patient) {
-        const patient = new Patient();
+        const patient = new this();
         
         if(pat.id)
             patient.ExternalID = pat.id;
@@ -216,6 +231,13 @@ export class Patient  {
 
         if(pat.managingOrganization)
             patient.ExternalSiteID = pat.managingOrganization;
+
+        if(pat.identifier && pat.identifier.length > 0){
+            const alias = pat.identifier.filter(i => i.type?.text?.toUpperCase() == "MYCHARTLOGIN");
+
+            if(alias && alias.length > 0)
+                patient.Alias = alias[0];
+        }
             
         return patient;
     }
