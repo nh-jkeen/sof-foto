@@ -1,3 +1,5 @@
+import { Episode } from "./FOTO/Episode";
+
 export class HttpClient {
 
     private readonly _base : string | null = null;
@@ -44,5 +46,30 @@ export class HttpClient {
 
             return await (await fetch(`${this._base}${uri}`, requestOptions)).json();
         }
+    }
+
+    async MockGetPatientEpisodes(uri: string) : Promise<any> {
+        return new Promise(function(resolve){
+            resolve([
+                {
+                    "BodyPartId": 18,
+                    "BodyPartText": "Lumbar Spine1",
+                    "CreateDate": "/Date(1627055636747-0400)/",
+                    "EpisodeId": 21153,
+                    "ImpairmentId": 50,
+                    "ImpairmentText": "NOC-musculo-skeletal disorder",
+                    "TherapistName": "Han Solo"
+                },
+                {
+                    "BodyPartId": 18,
+                    "BodyPartText": "Lumbar Spine",
+                    "CreateDate": "/Date(1627055636747-0400)/",
+                    "EpisodeId": 21152,
+                    "ImpairmentId": 50,
+                    "ImpairmentText": "NOC-musculo-skeletal disorder",
+                    "TherapistName": "Han Solo"
+                },
+            ] as Array<Episode>)
+        });
     }
 }

@@ -76,6 +76,11 @@ export default defineComponent({
 				{label: 'OUTOFSTOCK', value: 'outofstock'}
             ]
         }
+    },    
+    computed: {
+        ParseJsonDateString(date: string){
+            return new Date(parseInt(date.replace('/Date(', ''))).toLocaleString()
+        }
     },
     methods: {
         openNew() {

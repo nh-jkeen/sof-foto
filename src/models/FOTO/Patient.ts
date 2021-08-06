@@ -216,6 +216,8 @@ export class Patient  {
 
         if(pat.communication)
             patient.Language = pat.communication[0];
+        else
+            patient.Language = "en";
 
         if(pat.gender)
             patient.Gender = pat.gender;

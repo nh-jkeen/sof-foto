@@ -1,6 +1,15 @@
 
 <template>
+    <splash
+        :show="true"
+        :logo="logo"
+        color="#F9423A"
+        :size="300"
+        :fixed="true">
+    </splash>
+
     <Toast />
+    
     <h2 v-if="ErrMessage !== ''">{{ ErrMessage }}</h2>
     <div v-else>
         <episode-list :episodeArr="Episodes"></episode-list>
@@ -15,12 +24,14 @@ import { HttpClient } from "../models/HttpClient";
 import { Episode } from "../models/FOTO/Episode";
 // import FHIRClient from "fhirclient";
 import EpisodeList from "../components/Episode.vue";
+import Splash from "../components/Splash.vue";
 import Client from 'fhirclient/lib/Client';
 // import * as R4 from 'fhir/r4';
 
 export default defineComponent({
 	name: "App",
 	components: {
+        Splash,
 		EpisodeList,
 	},
     data: function() {
@@ -35,6 +46,11 @@ export default defineComponent({
             EncounterID: ""
         }
 	},
+    computed: {
+        logo() {
+            return require('../assets/nh_brand.png');
+        }
+    },
     async created(){
         try{
             // const api_key = process.env.VUE_APP_OUTBOUND_APIKEY;
@@ -56,43 +72,22 @@ export default defineComponent({
             // if(patient.birthDate === "")
             //     throw new Error("Unable to find patient birthdate. Please provide a birthdate for this patient.");
 
-            // const locationId = this.SmartClient.getState("tokenResponse.location");
+            // const locationId = this.SmartClient.getState("tokenResponse.loginDepartment");
             // if(locationId === "" || locationId === undefined)
             //     throw new Error("Unbled to find location identifier on token response");
     
             // const location = await this.SmartClient.request(`Location/${locationId}`);
-            // if(!location || location.alias.length == 0) 
+            // if(!location) 
             //     throw new Error("Location not found in EMR.");
     
             // const transformedPat = Patient.FromResource(patient as R4.Patient);
-            // transformedPat.ExternalSiteID = location.alias[0];
-    
-            // const patCreateResponse = await this.OutboundClient.Post(transformedPat.ToJSON(), "patient2/json");
+            // transformedPat.ExternalSiteID = location.name;
 
+            // const patCreateResponse = await this.OutboundClient.Post(transformedPat.ToJSON(), "patient2/json");
             // if(!patCreateResponse.Success)
             //     throw new Error(`Error creating or updating patient: ${patCreateResponse.Text}`);
     
-            // this.Episodes = await this.OutboundClient.Get(`episode/json/${1}`);
-            this.Episodes = [
-                {
-                    "BodyPartId": 18,
-                    "BodyPartText": "Lumbar Spine1",
-                    "CreateDate": new Date(parseInt("/Date(1627055636747-0400)/".replace('/Date(', ''))).toLocaleString(),
-                    "EpisodeId": 21153,
-                    "ImpairmentId": 50,
-                    "ImpairmentText": "NOC-musculo-skeletal disorder",
-                    "TherapistName": "Han Solo"
-                },
-                {
-                    "BodyPartId": 18,
-                    "BodyPartText": "Lumbar Spine",
-                    "CreateDate": "/Date(1627055636747-0400)/",
-                    "EpisodeId": 21152,
-                    "ImpairmentId": 50,
-                    "ImpairmentText": "NOC-musculo-skeletal disorder",
-                    "TherapistName": "Han Solo"
-                },
-            ] as Array<Episode>;
+            this.Episodes = await this.OutboundClient.MockGetPatientEpisodes(`episode/json/${1}`);
         }
         catch(ex){
             this.ErrMessage = (ex as Error).message;
@@ -112,7 +107,6 @@ export default defineComponent({
 	font-family: Avenir, Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	// text-align: center;
 	margin-top: 1rem;
 }
 </style>
